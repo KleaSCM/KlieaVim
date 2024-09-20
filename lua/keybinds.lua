@@ -1,5 +1,3 @@
-
-
 -- Function to set key mappings easily
 local function map(mode, lhs, rhs, opts)
     local options = { noremap = true, silent = true }
@@ -41,11 +39,24 @@ map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', { desc = 'Find reference
 map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', { desc = 'Hover documentation' })
 map('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', { desc = 'Rename symbol' })
 
--- open tree
+-- NvimTree
 map('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle NvimTree' })
 
-
--- Open terminal in a vertical split on the right
+-- Terminal
 map('n', '<Leader>t', ':vsplit<CR>:terminal<CR><C-w>l', { desc = 'Open terminal on the right' })
+map('n', '<Leader>ct', ':bd!<CR>', { desc = 'Close terminal' })
 
---  More key mappings can be added here...
+-- Additional key mappings
+map('n', '<C-c>', '"+y', { desc = 'Copy to clipboard' })
+map('n', '<C-v>', '"+p', { desc = 'Paste from clipboard' })
+map('n', '<C-x>', '"+d', { desc = 'Cut to clipboard' })
+map('n', '<C-z>', 'u', { desc = 'Undo' })
+map('n', '<C-s>', ':w<CR>', { desc = 'Save file' })
+map('n', '<Leader>rnf', ':Rename<CR>', { desc = 'Rename file' })
+map('n', '<C-S-c>', ':q!<CR>', { desc = 'Stop running task' })
+
+
+
+
+
+

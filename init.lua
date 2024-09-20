@@ -49,25 +49,18 @@ vim.o.sidescrolloff = 8
 vim.o.termguicolors = true
 vim.o.hidden = true
 
--- Transparency settings
-vim.cmd [[
-  highlight Normal guibg=NONE ctermbg=NONE
-  highlight NonText guibg=NONE ctermbg=NONE
-  highlight LineNr guibg=NONE ctermbg=NONE
-  highlight SignColumn guibg=NONE ctermbg=NONE
-  highlight EndOfBuffer guibg=NONE ctermbg=NONE
-]]
+-- Set background images
+vim.g.neovide_background_image = "/home/kliea/.config/nvim/assets/editor.png"
+vim.g.neovide_transparency = 0.8  -- Adjust for the desired transparency level
+vim.g.neovide_background_image_blur = 0.5  -- Optionally blur the image
 
--- Transparency for NvimTree
-vim.cmd [[
-  autocmd FileType NvimTree setlocal winhighlight=Normal:NormalNC
-]]
+
 
 -- Configure Mason
 require('mason').setup()
 require('mason-lspconfig').setup({
   ensure_installed = {
-    "ts_ls",      -- Updated to use ts_ls
+    "ts_ls",
     "eslint",
     "rust_analyzer",
     "gopls",
@@ -90,7 +83,7 @@ local on_attach = function(_, bufnr)
   buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
 end
 
-lspconfig.ts_ls.setup({ on_attach = on_attach })  -- Updated to ts_ls
+lspconfig.ts_ls.setup({ on_attach = on_attach })
 lspconfig.eslint.setup({ on_attach = on_attach })
 lspconfig.rust_analyzer.setup({ on_attach = on_attach })
 lspconfig.gopls.setup({ on_attach = on_attach })
@@ -99,11 +92,11 @@ lspconfig.clangd.setup({ on_attach = on_attach })
 
 -- Diagnostic configuration
 vim.diagnostic.config({
-  virtual_text = true,  -- Show errors as virtual text inline
-  signs = true,         -- Show signs in the sign column
-  update_in_insert = true,  -- Update diagnostics while in insert mode
-  underline = true,     -- Underline errors and warnings
-  severity_sort = true, -- Sort diagnostics by severity
+  virtual_text = true,
+  signs = true,
+  update_in_insert = true,
+  underline = true,
+  severity_sort = true,
 })
 
 -- Set colorscheme
@@ -139,7 +132,7 @@ require('lualine').setup({
     lualine_y = { 'location' },
     lualine_z = { 'progress' }
   },
-  extensions = { 'fugitive' } -- Add Git integration
+  extensions = { 'fugitive' }
 })
 
 -- Telescope fuzzy finder
@@ -152,6 +145,13 @@ require('nvim-tree').setup({
     side = 'left',
   },
 })
+
+-- Terminal setup on the right side
+vim.cmd [[
+  autocmd TermOpen * setlocal nonumber norelativenumber
+  autocmd TermOpen * startinsert
+  command! Terminal rightbelow split | wincmd l | terminal
+]]
 
 -- Treesitter setup
 require('nvim-treesitter.configs').setup({
@@ -192,4 +192,4 @@ vim.cmd [[
 ]]
 
 -- Load keybindings
-require('keybinds') 
+require('keybinds')
