@@ -1,5 +1,5 @@
 -- Enable mouse support
-vim.o.mouse = 'a' -- Enable mouse for all modes
+vim.o.mouse = 'a'
 
 -- Set the runtime path to include lazy.nvim
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
@@ -25,7 +25,15 @@ require('lazy').setup({
   'folke/tokyonight.nvim',
   'kyazdani42/nvim-tree.lua',
   'kyazdani42/nvim-web-devicons',
-  'lewis6991/gitsigns.nvim',  -- Gitsigns loaded here
+  'lewis6991/gitsigns.nvim',
+  'mfussenegger/nvim-dap',      -- Debugging
+  'rcarriga/nvim-dap-ui',       -- DAP UI
+  'nvim-neotest/nvim-nio',      -- Required for nvim-dap-ui
+  'williamboman/mason.nvim',    -- Mason
+  'williamboman/mason-lspconfig.nvim', -- Mason for LSP
+  'windwp/nvim-autopairs',      -- Auto-pairing
+  'iamcco/markdown-preview.nvim', -- Markdown Preview
+  'tpope/vim-fugitive',         -- Git integration
 })
 
 -- Basic settings
@@ -41,72 +49,147 @@ vim.o.sidescrolloff = 8
 vim.o.termguicolors = true
 vim.o.hidden = true
 
--- Load keybinds from the keybinds.lua file
-require('keybinds')
+-- Transparency settings
+vim.cmd [[
+  highlight Normal guibg=NONE ctermbg=NONE
+  highlight NonText guibg=NONE ctermbg=NONE
+  highlight LineNr guibg=NONE ctermbg=NONE
+  highlight SignColumn guibg=NONE ctermbg=NONE
+  highlight EndOfBuffer guibg=NONE ctermbg=NONE
+]]
+
+-- Transparency for NvimTree
+vim.cmd [[
+  autocmd FileType NvimTree setlocal winhighlight=Normal:NormalNC
+]]
+
+-- Configure Mason
+require('mason').setup()
+require('mason-lspconfig').setup({
+  ensure_installed = {
+    "ts_ls",      -- Updated to use ts_ls
+    "eslint",
+    "rust_analyzer",
+    "gopls",
+    "pyright",
+  },
+})
+
+-- LSP server setup
+local lspconfig = require('lspconfig')
+local on_attach = function(_, bufnr)
+  local buf_set_keymap = function(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local opts = { noremap = true, silent = true }
+  -- LSP key mappings
+  buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+end
+
+lspconfig.ts_ls.setup({ on_attach = on_attach })  -- Updated to ts_ls
+lspconfig.eslint.setup({ on_attach = on_attach })
+lspconfig.rust_analyzer.setup({ on_attach = on_attach })
+lspconfig.gopls.setup({ on_attach = on_attach })
+lspconfig.pyright.setup({ on_attach = on_attach })
+lspconfig.clangd.setup({ on_attach = on_attach })
+
+-- Diagnostic configuration
+vim.diagnostic.config({
+  virtual_text = true,  -- Show errors as virtual text inline
+  signs = true,         -- Show signs in the sign column
+  update_in_insert = true,  -- Update diagnostics while in insert mode
+  underline = true,     -- Underline errors and warnings
+  severity_sort = true, -- Sort diagnostics by severity
+})
 
 -- Set colorscheme
 vim.cmd('colorscheme tokyonight')
 
--- Load plugin configurations for nvim-tree
-require('nvim-tree').setup({
-  disable_netrw = true,
-  hijack_netrw = true,
-  update_focused_file = {
-    enable = true,
-    update_cwd = true,
+-- Nvim-CMP (Autocompletion)
+local cmp = require('cmp')
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end,
   },
-  view = {
-    width = 30,
-    side = 'left',
-    adaptive_size = false,
-    number = true,
-    relativenumber = true,
+  mapping = {
+    ['<C-n>'] = cmp.mapping.select_next_item(),
+    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
   },
 })
 
--- Load and configure gitsigns with new highlight API
-require('gitsigns').setup {
-  signs = {
-    add          = { text = '│' },
-    change       = { text = '│' },
-    delete       = { text = '_' },
-    topdelete    = { text = '‾' },
-    changedelete = { text = '~' },
+-- Lualine statusline
+require('lualine').setup({
+  options = { theme = 'tokyonight', section_separators = '', component_separators = '' },
+  sections = {
+    lualine_a = { 'mode' },
+    lualine_b = { 'branch', 'diff', 'diagnostics' },
+    lualine_c = { 'filename', 'lsp_progress' },
+    lualine_x = { 'encoding', 'fileformat', 'filetype' },
+    lualine_y = { 'location' },
+    lualine_z = { 'progress' }
   },
-  watch_gitdir = {
-    interval = 1000,
-    follow_files = true,
+  extensions = { 'fugitive' } -- Add Git integration
+})
+
+-- Telescope fuzzy finder
+require('telescope').setup()
+
+-- NvimTree setup
+require('nvim-tree').setup({
+  view = {
+    width = 30,
+    side = 'left',
   },
-  current_line_blame = true,
-}
+})
 
--- Set highlights using vim.api.nvim_set_hl
-vim.api.nvim_set_hl(0, 'GitSignsAdd', { link = 'GitGutterAdd' })
-vim.api.nvim_set_hl(0, 'GitSignsAddLn', { link = 'GitSignsAddLn' })
-vim.api.nvim_set_hl(0, 'GitSignsAddNr', { link = 'GitSignsAddNr' })
-vim.api.nvim_set_hl(0, 'GitSignsChange', { link = 'GitGutterChange' })
-vim.api.nvim_set_hl(0, 'GitSignsChangeLn', { link = 'GitSignsChangeLn' })
-vim.api.nvim_set_hl(0, 'GitSignsChangeNr', { link = 'GitSignsChangeNr' })
-vim.api.nvim_set_hl(0, 'GitSignsChangedelete', { link = 'GitGutterChange' })
-vim.api.nvim_set_hl(0, 'GitSignsChangedeleteLn', { link = 'GitSignsChangeLn' })
-vim.api.nvim_set_hl(0, 'GitSignsChangedeleteNr', { link = 'GitSignsChangeNr' })
-vim.api.nvim_set_hl(0, 'GitSignsDelete', { link = 'GitGutterDelete' })
-vim.api.nvim_set_hl(0, 'GitSignsDeleteLn', { link = 'GitSignsDeleteLn' })
-vim.api.nvim_set_hl(0, 'GitSignsDeleteNr', { link = 'GitSignsDeleteNr' })
-vim.api.nvim_set_hl(0, 'GitSignsTopdelete', { link = 'GitGutterDelete' })
-vim.api.nvim_set_hl(0, 'GitSignsTopdeleteLn', { link = 'GitSignsDeleteLn' })
-vim.api.nvim_set_hl(0, 'GitSignsTopdeleteNr', { link = 'GitSignsDeleteNr' })
-
--- Load Treesitter configurations
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = { "lua", "javascript", "typescript", "python", "html", "css", "bash" },
+-- Treesitter setup
+require('nvim-treesitter.configs').setup({
+  ensure_installed = "all",
   highlight = {
     enable = true,
   },
-  indent = {
-    enable = true,
-  },
-}
+})
 
--- Setup LSP for TypeScript (use ts_ls instead of tsserver)
-require('lspconfig').ts_ls.setup {}
+-- DAP (Debugging) setup
+local dap = require('dap')
+local dapui = require('dapui')
+
+dap.set_log_level('DEBUG')
+dapui.setup()
+
+-- Ensure keybindings for DAP
+vim.api.nvim_set_keymap('n', '<leader>db', '<cmd>lua require"dap".toggle_breakpoint()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>dc', '<cmd>lua require"dap".continue()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>di', '<cmd>lua require"dap".step_into()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>do', '<cmd>lua require"dap".step_over()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>dr', '<cmd>lua require"dap".repl.open()<CR>', { noremap = true })
+
+-- Additional setup for hover and diagnostics
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+  virtual_text = true,
+  signs = true,
+  update_in_insert = true,
+})
+
+-- Auto-pairs setup
+require('nvim-autopairs').setup{}
+
+-- Markdown Preview setup
+vim.cmd [[
+  autocmd FileType markdown nnoremap <buffer> <leader>mp :MarkdownPreview<CR>
+]]
+
+-- Load keybindings
+require('keybinds') 

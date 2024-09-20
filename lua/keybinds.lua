@@ -1,3 +1,5 @@
+
+
 -- Function to set key mappings easily
 local function map(mode, lhs, rhs, opts)
     local options = { noremap = true, silent = true }
@@ -43,13 +45,7 @@ map('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', { desc = 'Rename sym
 map('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle NvimTree' })
 
 
+-- Open terminal in a vertical split on the right
+map('n', '<Leader>t', ':vsplit<CR>:terminal<CR><C-w>l', { desc = 'Open terminal on the right' })
 
-
-
-
-
-
-
-
-
--- Optional: More key mappings can be added here...
+--  More key mappings can be added here...

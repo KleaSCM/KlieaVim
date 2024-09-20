@@ -1,4 +1,4 @@
--- lua/plugins/telescope.lua
+
 
 local telescope = require('telescope')
 
