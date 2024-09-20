@@ -15,7 +15,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   'tpope/vim-sleuth',
   'nvim-treesitter/nvim-treesitter',
-  'nvim-lualine/lualine.nvim',
+  'nvim-lualine/lualine.nvim', 
   'neovim/nvim-lspconfig',
   'hrsh7th/nvim-cmp',
   'hrsh7th/cmp-nvim-lsp',
@@ -56,11 +56,11 @@ vim.o.termguicolors = true
 vim.o.hidden = true
 
 -- Set background images
-vim.g.neovide_background_image = "/home/kliea/.config/nvim/assets/editor.png" 
-vim.g.neovide_transparency = 0.8  -- transparency level
-vim.g.neovide_background_image_blur = 0.5  -- blur the image
+vim.g.neovide_background_image = "/home/kliea/.config/nvim/assets/editor.png"
+vim.g.neovide_transparency = 0.8  -- Transparency level
+vim.g.neovide_background_image_blur = 0.5  -- Blur the image
 
--- Configure Mason ------- this is defunct as its now in mason.lua
+-- Configure Mason 
 require('mason').setup()
 require('mason-lspconfig').setup({
   ensure_installed = {
@@ -77,7 +77,7 @@ local lspconfig = require('lspconfig')
 local on_attach = function(_, bufnr)
   local buf_set_keymap = function(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local opts = { noremap = true, silent = true }
-  -- LSP key mappings --------defunct needs to be removed its in keybinds.lua
+  -- LSP key mappings 
   buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
   buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
@@ -101,10 +101,10 @@ vim.diagnostic.config({
   severity_sort = true,
 })
 
--- Set colorscheme -- will move the themes / colors to a themese directory with the config
+-- Set colorscheme 
 vim.cmd('colorscheme tokyonight')
 
--- Nvim-CMP (Autocompletion)   --------- move to plugins 
+-- Nvim-CMP (Autocompletion)   
 local cmp = require('cmp')
 cmp.setup({
   snippet = {
@@ -123,26 +123,15 @@ cmp.setup({
   },
 })
 
--- Lualine statusline  move to plugins
-require('lualine').setup({
-  options = { theme = 'tokyonight', section_separators = '', component_separators = '' },
-  sections = {
-    lualine_a = { 'mode' },
-    lualine_b = { 'branch', 'diff', 'diagnostics' },
-    lualine_c = { 'filename', 'lsp_progress' },
-    lualine_x = { 'encoding', 'fileformat', 'filetype' },
-    lualine_y = { 'location' },
-    lualine_z = { 'progress' }
-  },
-  extensions = { 'fugitive' }
-})
+-- Load Lualine setup from its own file
+require('plugins.lualine')
 
--- Gitsigns setup  --- wont work in plugins :/
+-- Gitsigns setup  
 require('gitsigns').setup({
-  signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
-  numhl = false,      -- Toggle with `:Gitsigns toggle_numhl`
-  linehl = false,     -- Toggle with `:Gitsigns toggle_linehl`
-  word_diff = false,  -- Toggle with `:Gitsigns toggle_word_diff`
+  signcolumn = true,
+  numhl = false,
+  linehl = false,
+  word_diff = false,
 })
 
 -- Telescope fuzzy finder
