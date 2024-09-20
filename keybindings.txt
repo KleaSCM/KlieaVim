@@ -1,0 +1,20 @@
+# Neovim Keybinds Reference
+
+## Normal Mode Keybinds:
+- `<Leader>ff` : Find files using Telescope.
+  - Action: Opens the file finder for quickly searching and opening files.
+  - Command: `:Telescope find_files`
+
+- `<Leader>fg` : Live grep using Telescope.
+  - Action: Searches for a string in the current project using live grep.
+  - Command: `:Telescope live_grep`
+
+## Insert Mode Keybinds:
+- None defined yet.
+
+## Visual Mode Keybinds:
+- None defined yet.
+
+## Custom Mappings:
+- The leader key is mapped to `\` (backslash).
+  - Example: `\ff` will trigger the file search command.
