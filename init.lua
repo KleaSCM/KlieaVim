@@ -1,4 +1,5 @@
--- init.lua
+-- Enable mouse support
+vim.o.mouse = 'a' -- Enable mouse for all modes
 
 -- Set the runtime path to include lazy.nvim
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
@@ -12,20 +13,19 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Load lazy.nvim and setup plugins
 require('lazy').setup({
-  -- Plugin manager
-  'tpope/vim-sleuth', -- Automatically adjusts indentation based on file content
-  'nvim-treesitter/nvim-treesitter', -- Syntax highlighting and parsing
-  'nvim-lualine/lualine.nvim', -- Status line
-  'neovim/nvim-lspconfig', -- LSP support
-  'hrsh7th/nvim-cmp', -- Autocompletion
-  'hrsh7th/cmp-nvim-lsp', -- LSP completion
-  'L3MON4D3/LuaSnip', -- Snippets
-  'saadparwaiz1/cmp_luasnip', -- Snippet completions
-  'nvim-telescope/telescope.nvim', -- Fuzzy finder
-  'folke/tokyonight.nvim', -- Theme
-  'kyazdani42/nvim-tree.lua', -- File explorer
-  'kyazdani42/nvim-web-devicons', -- Optional, for file icons
-  'lewis6991/gitsigns.nvim', -- Git integration
+  'tpope/vim-sleuth',
+  'nvim-treesitter/nvim-treesitter',
+  'nvim-lualine/lualine.nvim',
+  'neovim/nvim-lspconfig',
+  'hrsh7th/nvim-cmp',
+  'hrsh7th/cmp-nvim-lsp',
+  'L3MON4D3/LuaSnip',
+  'saadparwaiz1/cmp_luasnip',
+  'nvim-telescope/telescope.nvim',
+  'folke/tokyonight.nvim',
+  'kyazdani42/nvim-tree.lua',
+  'kyazdani42/nvim-web-devicons',
+  'lewis6991/gitsigns.nvim',  -- Gitsigns loaded here
 })
 
 -- Basic settings
@@ -41,21 +41,16 @@ vim.o.sidescrolloff = 8
 vim.o.termguicolors = true
 vim.o.hidden = true
 
--- Key mappings
-vim.api.nvim_set_keymap('n', '<Leader>ff', ':Telescope find_files<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>fg', ':Telescope live_grep<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>e', ':NvimTreeToggle<CR>', { noremap = true, silent = true }) -- New: File tree toggle
+-- Load keybinds from the keybinds.lua file
+require('keybinds')
 
 -- Set colorscheme
 vim.cmd('colorscheme tokyonight')
 
--- Load plugin configurations
+-- Load plugin configurations for nvim-tree
 require('nvim-tree').setup({
   disable_netrw = true,
   hijack_netrw = true,
-  open_on_setup = false,
-  auto_close = true,
-  open_on_tab = false,
   update_focused_file = {
     enable = true,
     update_cwd = true,
@@ -63,27 +58,48 @@ require('nvim-tree').setup({
   view = {
     width = 30,
     side = 'left',
-    auto_resize = true,
+    adaptive_size = false,
+    number = true,
+    relativenumber = true,
   },
 })
 
+-- Load and configure gitsigns with new highlight API
 require('gitsigns').setup {
   signs = {
-    add          = {hl = 'GitGutterAdd', text = '│', numhl='GitSignsAddNr', linehl='GitSignsAddLn'},
-    change       = {hl = 'GitGutterChange', text = '│', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
-    delete       = {hl = 'GitGutterDelete', text = '_', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
-    topdelete    = {hl = 'GitGutterDelete', text = '‾', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
-    changedelete = {hl = 'GitGutterChange', text = '~', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
+    add          = { text = '│' },
+    change       = { text = '│' },
+    delete       = { text = '_' },
+    topdelete    = { text = '‾' },
+    changedelete = { text = '~' },
   },
   watch_gitdir = {
     interval = 1000,
-    follow_files = true
+    follow_files = true,
   },
-  current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+  current_line_blame = true,
 }
 
+-- Set highlights using vim.api.nvim_set_hl
+vim.api.nvim_set_hl(0, 'GitSignsAdd', { link = 'GitGutterAdd' })
+vim.api.nvim_set_hl(0, 'GitSignsAddLn', { link = 'GitSignsAddLn' })
+vim.api.nvim_set_hl(0, 'GitSignsAddNr', { link = 'GitSignsAddNr' })
+vim.api.nvim_set_hl(0, 'GitSignsChange', { link = 'GitGutterChange' })
+vim.api.nvim_set_hl(0, 'GitSignsChangeLn', { link = 'GitSignsChangeLn' })
+vim.api.nvim_set_hl(0, 'GitSignsChangeNr', { link = 'GitSignsChangeNr' })
+vim.api.nvim_set_hl(0, 'GitSignsChangedelete', { link = 'GitGutterChange' })
+vim.api.nvim_set_hl(0, 'GitSignsChangedeleteLn', { link = 'GitSignsChangeLn' })
+vim.api.nvim_set_hl(0, 'GitSignsChangedeleteNr', { link = 'GitSignsChangeNr' })
+vim.api.nvim_set_hl(0, 'GitSignsDelete', { link = 'GitGutterDelete' })
+vim.api.nvim_set_hl(0, 'GitSignsDeleteLn', { link = 'GitSignsDeleteLn' })
+vim.api.nvim_set_hl(0, 'GitSignsDeleteNr', { link = 'GitSignsDeleteNr' })
+vim.api.nvim_set_hl(0, 'GitSignsTopdelete', { link = 'GitGutterDelete' })
+vim.api.nvim_set_hl(0, 'GitSignsTopdeleteLn', { link = 'GitSignsDeleteLn' })
+vim.api.nvim_set_hl(0, 'GitSignsTopdeleteNr', { link = 'GitSignsDeleteNr' })
+
+-- Load Treesitter configurations
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = { "lua", "javascript", "typescript", "python", "html", "css", "bash" }, -- Add languages you work with
+  ensure_installed = { "lua", "javascript", "typescript", "python", "html", "css", "bash" },
   highlight = {
     enable = true,
   },
@@ -91,3 +107,6 @@ require'nvim-treesitter.configs'.setup {
     enable = true,
   },
 }
+
+-- Setup LSP for TypeScript (use ts_ls instead of tsserver)
+require('lspconfig').ts_ls.setup {}

@@ -1,5 +1,3 @@
--- keybinds.lua
-
 -- Function to set key mappings easily
 local function map(mode, lhs, rhs, opts)
     local options = { noremap = true, silent = true }
@@ -40,3 +38,18 @@ map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { desc = 'Go to definiti
 map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', { desc = 'Find references' })
 map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', { desc = 'Hover documentation' })
 map('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', { desc = 'Rename symbol' })
+
+-- open tree
+map('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle NvimTree' })
+
+
+
+
+
+
+
+
+
+
+
+-- Optional: More key mappings can be added here...

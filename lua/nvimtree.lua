@@ -1,11 +1,6 @@
--- lua/plugins/nvimtree.lua
-
 require('nvim-tree').setup({
     disable_netrw = true,
     hijack_netrw = true,
-    open_on_setup = false,
-    auto_close = true,
-    open_on_tab = false,
     update_focused_file = {
       enable = true,
       update_cwd = true,
@@ -13,10 +8,10 @@ require('nvim-tree').setup({
     view = {
       width = 30,
       side = 'left',
-      auto_resize = true,
+      -- Remove auto_resize and open_on_setup
+      adaptive_size = false,  -- Use this if you want the width to adjust based on content
+      number = true,          -- Show line numbers
+      relativenumber = true,  -- Show relative line numbers
     },
   })
-  
-  -- Key mapping to toggle the file tree
-  vim.api.nvim_set_keymap('n', '<Leader>e', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
   
