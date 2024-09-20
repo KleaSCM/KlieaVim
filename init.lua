@@ -25,15 +25,21 @@ require('lazy').setup({
   'folke/tokyonight.nvim',
   'kyazdani42/nvim-tree.lua',
   'kyazdani42/nvim-web-devicons',
-  'lewis6991/gitsigns.nvim',
-  'mfussenegger/nvim-dap',      -- Debugging
-  'rcarriga/nvim-dap-ui',       -- DAP UI
-  'nvim-neotest/nvim-nio',      -- Required for nvim-dap-ui
-  'williamboman/mason.nvim',    -- Mason
+  'lewis6991/gitsigns.nvim',  -- Git integration
+  'tpope/vim-fugitive',       -- Git integration
+  'TimUntersberger/neogit',   -- Git UI
+  'mfussenegger/nvim-dap',    -- Debugging
+  'rcarriga/nvim-dap-ui',     -- DAP UI
+  'nvim-neotest/nvim-nio',    -- Required for nvim-dap-ui
+  'williamboman/mason.nvim',  -- Mason
   'williamboman/mason-lspconfig.nvim', -- Mason for LSP
-  'windwp/nvim-autopairs',      -- Auto-pairing
+  'windwp/nvim-autopairs',    -- Auto-pairing
   'iamcco/markdown-preview.nvim', -- Markdown Preview
-  'tpope/vim-fugitive',         -- Git integration
+  'akinsho/bufferline.nvim',   -- Better tab management
+  'jose-elias-alvarez/null-ls.nvim', -- Auto-formatting
+  'numToStr/Comment.nvim',     -- Easy commenting
+  'folke/todo-comments.nvim',   -- TODO management
+  'thinca/vim-quickrun',       -- Code runner
 })
 
 -- Basic settings
@@ -50,13 +56,11 @@ vim.o.termguicolors = true
 vim.o.hidden = true
 
 -- Set background images
-vim.g.neovide_background_image = "/home/kliea/.config/nvim/assets/editor.png"
-vim.g.neovide_transparency = 0.8  -- Adjust for the desired transparency level
-vim.g.neovide_background_image_blur = 0.5  -- Optionally blur the image
+vim.g.neovide_background_image = "/home/kliea/.config/nvim/assets/editor.png" 
+vim.g.neovide_transparency = 0.8  -- transparency level
+vim.g.neovide_background_image_blur = 0.5  -- blur the image
 
-
-
--- Configure Mason
+-- Configure Mason ------- this is defunct as its now in mason.lua
 require('mason').setup()
 require('mason-lspconfig').setup({
   ensure_installed = {
@@ -73,7 +77,7 @@ local lspconfig = require('lspconfig')
 local on_attach = function(_, bufnr)
   local buf_set_keymap = function(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local opts = { noremap = true, silent = true }
-  -- LSP key mappings
+  -- LSP key mappings --------defunct needs to be removed its in keybinds.lua
   buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
   buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
@@ -83,12 +87,10 @@ local on_attach = function(_, bufnr)
   buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
 end
 
-lspconfig.ts_ls.setup({ on_attach = on_attach })
-lspconfig.eslint.setup({ on_attach = on_attach })
-lspconfig.rust_analyzer.setup({ on_attach = on_attach })
-lspconfig.gopls.setup({ on_attach = on_attach })
-lspconfig.pyright.setup({ on_attach = on_attach })
-lspconfig.clangd.setup({ on_attach = on_attach })
+local servers = { "ts_ls", "eslint", "rust_analyzer", "gopls", "pyright", "clangd" }
+for _, server in ipairs(servers) do
+  lspconfig[server].setup({ on_attach = on_attach })
+end
 
 -- Diagnostic configuration
 vim.diagnostic.config({
@@ -99,10 +101,10 @@ vim.diagnostic.config({
   severity_sort = true,
 })
 
--- Set colorscheme
+-- Set colorscheme -- will move the themes / colors to a themese directory with the config
 vim.cmd('colorscheme tokyonight')
 
--- Nvim-CMP (Autocompletion)
+-- Nvim-CMP (Autocompletion)   --------- move to plugins 
 local cmp = require('cmp')
 cmp.setup({
   snippet = {
@@ -121,7 +123,7 @@ cmp.setup({
   },
 })
 
--- Lualine statusline
+-- Lualine statusline  move to plugins
 require('lualine').setup({
   options = { theme = 'tokyonight', section_separators = '', component_separators = '' },
   sections = {
@@ -133,6 +135,14 @@ require('lualine').setup({
     lualine_z = { 'progress' }
   },
   extensions = { 'fugitive' }
+})
+
+-- Gitsigns setup  --- wont work in plugins :/
+require('gitsigns').setup({
+  signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
+  numhl = false,      -- Toggle with `:Gitsigns toggle_numhl`
+  linehl = false,     -- Toggle with `:Gitsigns toggle_linehl`
+  word_diff = false,  -- Toggle with `:Gitsigns toggle_word_diff`
 })
 
 -- Telescope fuzzy finder
@@ -168,12 +178,8 @@ local dapui = require('dapui')
 dap.set_log_level('DEBUG')
 dapui.setup()
 
--- Ensure keybindings for DAP
-vim.api.nvim_set_keymap('n', '<leader>db', '<cmd>lua require"dap".toggle_breakpoint()<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<leader>dc', '<cmd>lua require"dap".continue()<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<leader>di', '<cmd>lua require"dap".step_into()<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<leader>do', '<cmd>lua require"dap".step_over()<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<leader>dr', '<cmd>lua require"dap".repl.open()<CR>', { noremap = true })
+-- Keybinding to open DAP UI
+vim.api.nvim_set_keymap('n', '<leader>du', ':lua require("dapui").open()<CR>', { noremap = true, silent = true })
 
 -- Additional setup for hover and diagnostics
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
@@ -190,6 +196,20 @@ require('nvim-autopairs').setup{}
 vim.cmd [[
   autocmd FileType markdown nnoremap <buffer> <leader>mp :MarkdownPreview<CR>
 ]]
+
+-- Comment.nvim setup
+require('Comment').setup()
+
+-- Todo-comments.nvim setup
+require('todo-comments').setup()
+
+-- Code Runner setup
+vim.cmd [[
+  command! RunCode :QuickRun
+]]
+
+-- Bufferline setup
+require('bufferline').setup{}
 
 -- Load keybindings
 require('keybinds')

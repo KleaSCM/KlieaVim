@@ -10,7 +10,7 @@ end
 -- Leader key
 vim.g.mapleader = ' ' -- Set space as the leader key
 
--- General key mappings
+-- Telescope
 map('n', '<Leader>ff', ':Telescope find_files<CR>', { desc = 'Find files' })
 map('n', '<Leader>fg', ':Telescope live_grep<CR>', { desc = 'Live grep' })
 
@@ -33,11 +33,12 @@ map('n', '<Leader>bd', ':bdelete<CR>', { desc = 'Delete buffer' })
 map('n', '<Leader>ws', ':split<CR>', { desc = 'Horizontal split' })
 map('n', '<Leader>wv', ':vsplit<CR>', { desc = 'Vertical split' })
 
--- LSP (Language Server Protocol)
+-- LSP 
 map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { desc = 'Go to definition' })
 map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', { desc = 'Find references' })
 map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', { desc = 'Hover documentation' })
 map('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', { desc = 'Rename symbol' })
+map('n', '<Leader>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', { desc = 'Format code' })
 
 -- NvimTree
 map('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle NvimTree' })
@@ -55,8 +56,18 @@ map('n', '<C-s>', ':w<CR>', { desc = 'Save file' })
 map('n', '<Leader>rnf', ':Rename<CR>', { desc = 'Rename file' })
 map('n', '<C-S-c>', ':q!<CR>', { desc = 'Stop running task' })
 
+-- DAP keybindings
+map('n', '<Leader>db', '<cmd>lua require"dap".toggle_breakpoint()<CR>', { desc = 'Toggle breakpoint' })
+map('n', '<Leader>dc', '<cmd>lua require"dap".continue()<CR>', { desc = 'Continue debugging' })
+map('n', '<Leader>di', '<cmd>lua require"dap".step_into()<CR>', { desc = 'Step into' })
+map('n', '<Leader>do', '<cmd>lua require"dap".step_over()<CR>', { desc = 'Step over' })
+map('n', '<Leader>dr', '<cmd>lua require"dap".repl.open()<CR>', { desc = 'Open REPL' })
+map('n', '<Leader>du', '<cmd>lua require"dapui".toggle()<CR>', { desc = 'Toggle DAP UI' })
 
+-- Additional key mappings for code management
+map('n', '<Leader>mp', ':MarkdownPreview<CR>', { desc = 'Preview Markdown' })
 
-
+-- Bufferline keybindings 
+map('n', '<Leader>bp', ':BufferLinePick<CR>', { desc = 'Pick buffer' })
 
 

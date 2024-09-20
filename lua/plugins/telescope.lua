@@ -1,5 +1,4 @@
 
-
 local telescope = require('telescope')
 
 telescope.setup{
@@ -28,7 +27,3 @@ telescope.setup{
     },
   },
 }
-
--- Telescope keybindings
-vim.api.nvim_set_keymap('n', '<Leader>ff', '<cmd>Telescope find_files<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>fg', '<cmd>Telescope live_grep<CR>', { noremap = true, silent = true })

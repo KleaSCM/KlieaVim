@@ -1,6 +1,6 @@
 
 
--- Create a custom statusline function
+-- custom statusline function
   _G.statusline = function()  -- Use _G to make it global
     local mode = vim.fn.mode()
     local filename = vim.fn.expand('%:t')

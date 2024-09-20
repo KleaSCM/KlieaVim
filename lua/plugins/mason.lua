@@ -1,4 +1,3 @@
-
 -- Load Mason setup
 require('mason').setup()
 
@@ -16,5 +15,10 @@ require('mason-lspconfig').setup({
     "cssls",                  -- CSS
     "kotlin_language_server", -- Kotlin
     "jdtls",                  -- Java
+    "lua_ls",                 -- Lua Language Server
+    "bashls",                 -- Bash Language Server
+    "hls",                    -- Haskell Language Server (optional)
+    "jsonls",                 -- JSON Language Server (optional)
+    "yaml_language_server",    -- YAML Language Server (optional)
   },
 })
